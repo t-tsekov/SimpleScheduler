@@ -32,7 +32,7 @@ namespace SimpleScheduler.Services
             string FromTitle = _config[FromTitleString];
             string Password = _config[PasswordString];
             string SmtpServer = _config[SmtpServerString];
-            int Port = int.Parse(_config[PasswordString]);
+            int Port = int.Parse(_config[PortString]);
 
             string ToAddress = toAddress;
             string BodyContent = body;
