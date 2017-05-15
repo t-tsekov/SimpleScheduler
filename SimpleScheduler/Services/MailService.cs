@@ -10,9 +10,16 @@ using System.Threading.Tasks;
 
 namespace SimpleScheduler.Services
 {
-    public class MailService
+    public class MailService  : IMailSender
     {
         private IConfiguration _config;
+        private const string FromMailString = "Data:FromMail";
+        private const string FromTitleString = "Data:FromTitle";
+        private const string PasswordString = "Data:Password";
+        private const string PortString = "Data:Port";
+        private const string SmtpServerString = "Data:SmtpServer";
+        private const string Subject = "Simple Scheduler task fired";
+
         public MailService(IConfiguration configuration)
         {
             _config = configuration;
@@ -21,17 +28,16 @@ namespace SimpleScheduler.Services
 
         public void SendMail(string toAddress, string body, IJobCancellationToken cancellationToken)
         {
-            string FromMail = _config["Data:FromMail"];
-            string FromTitle = _config["Data:FromTitle"];
-            string Password = _config["Data:Password"];
-            int Port = int.Parse(_config["Data:Port"]);
-            string SmtpServer = _config["Data:SmtpServer"];
+            string FromMail = _config[FromMailString];
+            string FromTitle = _config[FromTitleString];
+            string Password = _config[PasswordString];
+            string SmtpServer = _config[SmtpServerString];
+            int Port = int.Parse(_config[PasswordString]);
 
             string ToAddress = toAddress;
-            string Subject = "Hello World - Sending email using ASP.NET Core 1.1";
             string BodyContent = body;
 
-            var mimeMessage = new MimeMessage();
+            MimeMessage mimeMessage = new MimeMessage();
             mimeMessage.From.Add(new MailboxAddress(FromTitle, FromMail));
             mimeMessage.To.Add(new MailboxAddress(ToAddress));
             mimeMessage.Subject = Subject;
@@ -40,14 +46,12 @@ namespace SimpleScheduler.Services
                 Text = BodyContent
 
             };
+
             try
             {
                 using (var client = new SmtpClient())
                 {
-
                     client.Connect(SmtpServer, Port, false);
-                    // Note: only needed if the SMTP server requires authentication
-                    // Error 5.5.1 Authentication 
                     client.Authenticate(FromMail, Password);
                     client.Send(mimeMessage);
                     client.Disconnect(true);

@@ -34,7 +34,7 @@ namespace SimpleScheduler
             services.AddMvc();
             services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("HangFireConnectionString")));
             services.AddSingleton<IConfiguration>(Configuration);
-            services.AddSingleton<MailService>();
+            services.AddSingleton<IMailSender, MailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
