@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Hangfire;
+using SimpleScheduler.Services;
+using SimpleScheduler.HangfireExtensions;
 
 namespace SimpleScheduler
 {
@@ -29,6 +32,9 @@ namespace SimpleScheduler
         {
             // Add framework services.
             services.AddMvc();
+            services.AddHangfire(config => config.UseSqlServerStorage(Configuration.GetConnectionString("HangFireConnectionString")));
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<MailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +42,13 @@ namespace SimpleScheduler
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseHangfireServer();
+            app.UseHangfireDashboard("/tasks", new DashboardOptions
+            {
+                Authorization = new[] { new AuthFilter() }
+            });
+            app.UseHangfireServer();
 
             if (env.IsDevelopment())
             {

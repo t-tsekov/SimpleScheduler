@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Hangfire;
+using SimpleScheduler.Services;
 
 namespace SimpleScheduler.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private MailService _mailService; 
+        public HomeController(MailService mailService)
         {
+            _mailService = mailService;
+        }
+        public  IActionResult Index()
+        {
+            //BackgroundJob.Enqueue( () => _mailService.SendMail("77rvg77@gmail.com", "test mail", JobCancellationToken.Null)); 
             return View();
         }
 
@@ -20,12 +28,6 @@ namespace SimpleScheduler.Controllers
             return View();
         }
 
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
 
         public IActionResult Error()
         {
